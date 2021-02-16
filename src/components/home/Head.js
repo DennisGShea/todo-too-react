@@ -6,11 +6,13 @@ const { Search } = Input
 function Head({ todoListItems, setTodoListItems }) {
   const { user } = useContext(UserContext)
   const [newTodo, setNewTodo] = useState(null)
-  function addTodo() {    
+  function addTodo() { 
+    if( newTodo && newTodo.item && newTodo.item.trim ){    
     setTodoListItems([...todoListItems, newTodo])
     localStorage.setItem('todoList', JSON.stringify([...todoListItems, newTodo]))
     setNewTodo(null)
   }
+}
   return (
     <header style={{ textAlign: 'center' }}>
       <h1>Welcome {user ? 'User!' : 'Guest.'}</h1>
