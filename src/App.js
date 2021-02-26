@@ -1,3 +1,4 @@
+
 import React, { useState, createContext } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import firebase from 'firebase'
@@ -16,7 +17,7 @@ const firebaseAuth = firebase.auth()
 export const UserContext = createContext(null)
 
 function App() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null)
   return (
     <UserContext.Provider value={{ user, setUser, firebaseAuth }}>
       <Router>
@@ -41,4 +42,3 @@ function App() {
 }
 
 export default App
-// Feb5PM

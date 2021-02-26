@@ -3,13 +3,29 @@ import { Input, Space, Avatar } from 'antd'
 import { UserContext } from '../../App'
 const { Search } = Input
 
-function Head({ todoListItems, setTodoListItems }) {
+function Head({ setTodoListItems, setLoading }) {
   const { user } = useContext(UserContext)
   const [newTodo, setNewTodo] = useState(null)
   function addTodo() {
     if(newTodo && newTodo.item && newTodo.item.trim()){
-      setTodoListItems([...todoListItems, newTodo])
-      localStorage.setItem('todoList', JSON.stringify([...todoListItems, newTodo]))
+      setLoading(true)
+      fetch(`https://todo-too-dgs2.web.app/tasks/${user.uid}`, {
+      // fetch(`https://todo-bc-api.web.app/tasks/${user.uid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newTodo)
+      })
+      .then(res => res.json())
+      .then(data => {
+        setTodoListItems(data)
+        setLoading(false)
+      })
+      .catch(e => {
+        setLoading(false)
+        console.log(e)
+      })
     }
     setNewTodo(null)
   }
@@ -18,20 +34,19 @@ function Head({ todoListItems, setTodoListItems }) {
   const userImage = (!user || !user.photoURL)
     ? null : <Avatar size={48} src={user.photoURL} />
   return (
-    <header style={{ textAlign: 'center' }}>
+    <header style={{ textAlign: 'center', paddingBottom: '40px' }}>
       <h1>Welcome {greeting} {userImage}</h1>
-      <h2>Todo:</h2>
-      <Space direction="vertical">
+      {user && <Space direction="vertical">
         <Search
           placeholder="New Todo Item"
           allowClear
           enterButton="ADD"
           size="large"
           value={newTodo ? newTodo.item : null}
-          onChange={(e) => setNewTodo({ item: e.target.value, done: false })}
+          onChange={(e) => setNewTodo({ item: e.target.value, userId: user.uid })}
           onSearch={addTodo}
         />
-      </Space>
+      </Space>}
     </header>
   )
 }

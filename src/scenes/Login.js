@@ -34,23 +34,32 @@ const Login = () => {
         setLoading(false)
         history.push("/")
       })
-      .catch(err => setError(err.message))
+      .catch(err => {
+        setLoading(false)
+        setError(err.message)
+      })
   }
   const loginWithGoogle = () => {
     setLoading(true)
     const provider = new firebase.auth.GoogleAuthProvider()
-    firebase.auth().signInWithPopup(provider)
-      .then(res => {
-        setError(null)
-        setUser(res.user)
-        console.log(res.user.displayName)
-        console.log(res.user.photoURL)
-        setLoading(false)
-        history.push("/")
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => {
+        firebase.auth().signInWithPopup(provider)
+          .then(res => {
+            setError(null)
+            setUser(res.user)
+            setLoading(false)
+            localStorage.setItem('user', JSON.stringify(res.user))
+            history.push("/")
+          })
       })
-      .catch(err => setError(err.message))
+      .catch(err => {
+        setLoading(false)
+        setError(err.message)
+      })
   }
   const onFinishFailed = (errorInfo) => {
+    setLoading(false)
     console.log('Failed:', errorInfo)
     setError('Please input a valid email and password')
   }
